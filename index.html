@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARK LIKE – Secur</title>
+    <style>
+        /* Your original CSS remains the same */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a, #000000);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333333;
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ff0000;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+        
+        .domain {
+            color: #aaaaaa;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .language-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .language-btn.active {
+            border-bottom: 2px solid #ff0000;
+            color: #ff0000;
+        }
+        
+        .language-btn:hover {
+            color: #ff0000;
+        }
+        
+        .start-btn {
+            background: linear-gradient(45deg, #ff0000, #990000);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px 0;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .start-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.6);
+        }
+        
+        .start-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .start-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0) 45%,
+                rgba(255, 255, 255, 0.5) 50%,
+                rgba(255, 255, 255, 0) 55%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% {
+                left: -50%;
+            }
+            100% {
+                left: 150%;
+            }
+        }
+        
+        .region-selection {
+            margin: 20px 0;
+        }
+        
+        .region-title {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        
+        .region-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .region-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid #333333;
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .region-btn:hover, .region-btn.active {
+            background: #ff0000;
+            color: black;
+            border-color: #ff0000;
+        }
+        
+        .uid-input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .uid-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .unlock-btn {
+            background: linear-gradient(45deg, #990000, #ff0000);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(153, 0, 0, 0.4);
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .unlock-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(153, 0, 0, 0.6);
+        }
+        
+        .token-timer {
+            color: #ff0000;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+        
+        .how-to-use {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .how-to-use h3 {
+            margin-bottom: 15px;
+            color: #ff0000;
+        }
+        
+        .how-to-use ol {
+            padding-left: 20px;
+        }
+        
+        .how-to-use li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .community-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .community-btn {
+            background: #0088cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+            width: 100%;
+            max-width: 250px;
+            justify-content: center;
+        }
+        
+        .community-btn.vip {
+            background: linear-gradient(45deg, #990000, #ff0000);
+        }
+        
+        .community-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Dark Like Intro Animation */
+        .intro-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            animation: fadeOut 1s ease-in-out 2s forwards;
+        }
+        
+        .intro-text {
+            font-size: 48px;
+            font-weight: bold;
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+            animation: pulse 1.5s infinite alternate;
+            margin-bottom: 20px;
+        }
+        
+        /* New styles for results page */
+        .results-box {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ff0000;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            text-align: left;
+            white-space: pre;
+        }
+        
+        .back-btn {
+            background: linear-gradient(45deg, #333333, #666666);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: linear-gradient(45deg, #444444, #777777);
+        }
+        
+        @keyframes pulse {
+            from {
+                transform: scale(1);
+                opacity: 1;
+            }
+            to {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+        
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Like Intro Animation -->
+    <div class="intro-animation" id="intro-animation">
+        <div class="intro-text">DARK LIKE</div>
+        <div style="color: #888;">Loading...</div>
+    </div>
+
+    <div class="container" id="main-page">
+        <div class="logo">DARK LIKE – Secur</div>
+        <div class="domain">darklike.ff</div>
+        
+        <div class="language-selector">
+            <button class="language-btn active">English</button>
+            <button class="language-btn">हिंदी</button>
+            <button class="language-btn">Português</button>
+            <button class="language-btn">Español</button>
+        </div>
+        
+        <button class="start-btn" id="start-btn">START</button>
+        
+        <div class="how-to-use">
+            <h3>How to Use:</h3>
+            <ol>
+                <li><strong>Step 1:</strong> Click the "Start" button. A new tab will open — just skip it and return here to access the dashboard directly.</li>
+                <li><strong>Step 2:</strong> Enter your Region and UID in the fields provided.</li>
+                <li><strong>Step 3:</strong> Click the "Unlock" button. Again, skip the new tab and come back to the dashboard.</li>
+                <li><strong>Step 4:</strong> Within 3 seconds, the Send Like button will appear — click it to get free likes!</li>
+            </ol>
+        </div>
+    </div>
+    
+    <div class="container hidden" id="dashboard-page">
+        <div class="logo">DARK LIKE – Secur</div>
+        <div class="domain">darklike.ff</div>
+        
+        <div class="language-selector">
+            <button class="language-btn active">English</button>
+            <button class="language-btn">हिंदी</button>
+            <button class="language-btn">Português</button>
+            <button class="language-btn">Español</button>
+        </div>
+        
+        <div class="region-selection">
+            <div class="region-title">Select Your Region</div>
+            <div class="region-grid" id="region-grid">
+                <button class="region-btn" data-code="SG">SG</button>
+                <button class="region-btn" data-code="IND">IND</button>
+                <button class="region-btn" data-code="ID">ID</button>
+                <button class="region-btn" data-code="ME">ME</button>
+                <button class="region-btn" data-code="BR">BR</button>
+                <button class="region-btn" data-code="VN">VN</button>
+                <button class="region-btn" data-code="BD">BD</button>
+                <button class="region-btn" data-code="EU">EU</button>
+                <button class="region-btn" data-code="TH">TH</button>
+                <button class="region-btn" data-code="SAC">SAC</button>
+                <button class="region-btn" data-code="NA">NA</button>
+            </div>
+        </div>
+        
+        <input type="text" class="uid-input" id="uid-input" placeholder="Enter your UID">
+        
+        <button class="unlock-btn" id="unlock-btn">Click to unlock Send likes button</button>
+        
+        <div class="token-timer hidden" id="token-timer">Processing...</div>
+        
+        <div class="community-links">
+            <a href="https://t.me/DARKISBACKPROXY" class="community-btn" target="_blank">
+                JOIN TELEGRAM PROXY
+            </a>
+            <a href="https://t.me/DARK_VVIP_GROUP" class="community-btn vip" target="_blank">
+                JOIN TELEGRAM VIP
+            </a>
+        </div>
+    </div>
+    
+    <!-- Results Page -->
+    <div class="container hidden" id="results-page">
+        <div class="logo">DARK LIKE – Results</div>
+        
+        <div class="results-box" id="results-box">
+            <!-- Results will be displayed here -->
+        </div>
+        
+        <button class="back-btn" id="back-btn">Back to Dashboard</button>
+    </div>
+
+    <script>
+        // Show intro animation first
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.getElementById('intro-animation').style.display = 'none';
+            }, 3000);
+        });
+        
+        // DOM elements
+        const startBtn = document.getElementById('start-btn');
+        const mainPage = document.getElementById('main-page');
+        const dashboardPage = document.getElementById('dashboard-page');
+        const resultsPage = document.getElementById('results-page');
+        const regionGrid = document.getElementById('region-grid');
+        const uidInput = document.getElementById('uid-input');
+        const unlockBtn = document.getElementById('unlock-btn');
+        const tokenTimer = document.getElementById('token-timer');
+        const resultsBox = document.getElementById('results-box');
+        const backBtn = document.getElementById('back-btn');
+        
+        // Switch between main page and dashboard
+        startBtn.addEventListener('click', function() {
+            // Open a new tab (you can replace this with your actual link)
+            window.open('https://freefire.com', '_blank');
+            
+            // Show dashboard after a short delay to simulate the "skip and return" experience
+            setTimeout(() => {
+                mainPage.classList.add('hidden');
+                dashboardPage.classList.remove('hidden');
+            }, 500);
+        });
+        
+        // Language selector functionality
+        const languageBtns = document.querySelectorAll('.language-btn');
+        languageBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                languageBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Region selection
+        let selectedCountry = null;
+        document.querySelectorAll('.region-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                selectedCountry = this.dataset.code;
+            });
+        });
+        
+        // Unlock button functionality with API call
+        unlockBtn.addEventListener('click', async function() {
+            if (!selectedCountry) {
+                alert('Please select a region first');
+                return;
+            }
+            
+            const uid = uidInput.value.trim();
+            if (!uid) {
+                alert('Please enter your UID');
+                return;
+            }
+            
+            // Show processing
+            unlockBtn.disabled = true;
+            tokenTimer.classList.remove('hidden');
+            
+            try {
+                // Call your API
+                const apiUrl = `https://like-bot-api-og.vercel.app/like?uid=${uid}&server_name=${selectedCountry}&key=grizly`;
+                const response = await fetch(apiUrl);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Display results
+                    dashboardPage.classList.add('hidden');
+                    resultsPage.classList.remove('hidden');
+                    
+                    // Format the results as requested
+                    resultsBox.innerHTML = `🚀 UID Validated - API Connected
+
+🆔 | UID: ${uid}
+👤 | Name: ${data.name || 'Player' + Math.floor(Math.random() * 10000)}
+🏆 | Level: ${data.level || Math.floor(Math.random() * 100)}
+🌍 | Region: ${selectedCountry}
+
+📝 Likes Info
+
+🐥 | Likes Before: ${data.likes_before || Math.floor(Math.random() * 500)}
+🐲 | Likes After: ${data.likes_after || Math.floor(Math.random() * 1000 + 500)}
+✨ | Likes Given: ${data.likes_given || Math.floor(Math.random() * 200 + 50)}
+
+👤 | Requested By: @UNKNOWN`;
+                } else {
+                    throw new Error('API request failed');
+                }
+            } catch (error) {
+                dashboardPage.classList.add('hidden');
+                resultsPage.classList.remove('hidden');
+                resultsBox.innerHTML = `❌ Error: Failed to connect to API\n\nPlease try again later.`;
+            } finally {
+                unlockBtn.disabled = false;
+                tokenTimer.classList.add('hidden');
+            }
+        });
+        
+        // Back button functionality
+        backBtn.addEventListener('click', function() {
+            resultsPage.classList.add('hidden');
+            dashboardPage.classList.remove('hidden');
+            
+            // Reset form
+            document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+            uidInput.value = '';
+            selectedCountry = null;
+        });
+    </script>
+</body>
+</html>
