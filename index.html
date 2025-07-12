@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AstuTech VIP Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script> <!-- Changed to Realtime Database -->
     <style>
         * {
             margin: 0;
@@ -543,9 +540,218 @@
         .dashboard-content::-webkit-scrollbar-thumb:hover {
             background: #a020f0;
         }
+        
+        /* New login animation styles */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 12, 31, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .login-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .login-animation-container {
+            text-align: center;
+            max-width: 300px;
+            padding: 30px;
+            background: rgba(7, 30, 72, 0.8);
+            border-radius: 15px;
+            border: 1px solid #7a49ff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .login-animation-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .login-spinner {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(122, 73, 255, 0.2);
+            border-top: 5px solid #7a49ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .login-success-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #7a49ff, #a020f0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: white;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.4s ease;
+        }
+        
+        .login-success-icon.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .login-animation-text {
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 15px;
+            color: #ffffff;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.4s ease;
+        }
+        
+        .login-animation-text.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .login-status-details {
+            color: #a0b1cb;
+            margin-top: 15px;
+            font-size: 15px;
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+        
+        .login-status-details.show {
+            opacity: 1;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Update animation */
+        .update-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(4, 12, 31, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .update-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .update-animation-container {
+            text-align: center;
+            max-width: 280px;
+            padding: 25px;
+            background: rgba(7, 30, 72, 0.8);
+            border-radius: 15px;
+            border: 1px solid #7a49ff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .update-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(122, 73, 255, 0.2);
+            border-top: 4px solid #7a49ff;
+            border-radius: 50%;
+            margin: 0 auto;
+            animation: spin 1s linear infinite;
+        }
+        
+        .update-success-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #7a49ff, #a020f0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            margin: 0 auto;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.4s ease;
+        }
+        
+        .update-success-icon.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .update-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 20px;
+            color: #ffffff;
+        }
+        
+        .update-status {
+            color: #a0b1cb;
+            margin-top: 10px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
+    <!-- Login Animation Overlay -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-animation-container">
+            <div class="login-animation-icon">
+                <div class="login-spinner" id="loginSpinner"></div>
+                <div class="login-success-icon" id="loginSuccessIcon">
+                    <i class="fas fa-check"></i>
+                </div>
+            </div>
+            <div class="login-animation-text" id="loginText">Logging in...</div>
+            <div class="login-status-details" id="loginDetails">
+                <p>Accessing VIP server...</p>
+                <p>Verifying credentials...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Update Animation Overlay -->
+    <div class="update-overlay" id="updateOverlay">
+        <div class="update-animation-container">
+            <div class="update-spinner" id="updateSpinner"></div>
+            <div class="update-success-icon" id="updateSuccessIcon">
+                <i class="fas fa-check"></i>
+            </div>
+            <div class="update-text" id="updateText">Updating Profile...</div>
+            <div class="update-status" id="updateStatus">Please wait while we save your changes</div>
+        </div>
+    </div>
+    
     <div class="notification" id="notification">
         <i class="fas fa-check-circle"></i> <span id="notification-text">Successfully logged in!</span>
     </div>
@@ -686,12 +892,12 @@
                     
                     <div class="form-group">
                         <label class="form-label">Gold</label>
-                        <input type="text" class="custom-input" value="1341742864">
+                        <input type="text" class="custom-input" value="1341742864" id="goldInput">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Diamonds</label>
-                        <input type="text" class="custom-input" placeholder="Enter diamond amount">
+                        <input type="text" class="custom-input" placeholder="Enter diamond amount" id="diamondsInput">
                     </div>
                     
                     <div class="form-group">
@@ -714,20 +920,20 @@
                     
                     <div class="form-group">
                         <label class="form-label">Level</label>
-                        <input type="number" class="custom-input" placeholder="Enter level" min="1" max="100">
+                        <input type="number" class="custom-input" placeholder="Enter level" min="1" max="100" id="levelInput">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Likes</label>
-                        <input type="number" class="custom-input" placeholder="Enter likes count" min="0">
+                        <input type="number" class="custom-input" placeholder="Enter likes count" min="0" id="likesInput">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Custom ID</label>
-                        <input type="text" class="custom-input" placeholder="Enter custom ID">
+                        <input type="text" class="custom-input" placeholder="Enter custom ID" id="customIdInput">
                     </div>
                     
-                    <button class="update-btn">Update Profile</button>
+                    <button class="update-btn" id="updateBtn">Update Profile</button>
                 </div>
             </div>
         </div>
@@ -739,23 +945,6 @@
     </div>
 
     <script>
-        // Updated Firebase configuration for Realtime Database
-        const firebaseConfig = {
-            apiKey: "AIzaSyBOg09RLtzrpwingJzcFxWxyQa-jPHUN_o",
-            authDomain: "visual-cc58b.firebaseapp.com",
-            databaseURL: "https://visual-cc58b-default-rtdb.firebaseio.com", // Realtime Database URL
-            projectId: "visual-cc58b",
-            storageBucket: "visual-cc58b.appspot.com",
-            messagingSenderId: "236633699332",
-            appId: "1:236633699332:web:d71195b26b1c4ade21f151",
-            measurementId: "G-RT732Q3YN8"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database(); // Realtime Database reference
-
         // DOM Elements
         const loginForm = document.getElementById('loginForm');
         const dashboard = document.getElementById('dashboard');
@@ -772,6 +961,20 @@
         const portalContainer = document.getElementById('portalContainer');
         const subscriptionPlans = document.getElementById('subscriptionPlans');
         const planCards = document.querySelectorAll('.plan-card');
+        const updateBtn = document.getElementById('updateBtn');
+        
+        // Animation elements
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const loginSuccessIcon = document.getElementById('loginSuccessIcon');
+        const loginText = document.getElementById('loginText');
+        const loginDetails = document.getElementById('loginDetails');
+        
+        const updateOverlay = document.getElementById('updateOverlay');
+        const updateSpinner = document.getElementById('updateSpinner');
+        const updateSuccessIcon = document.getElementById('updateSuccessIcon');
+        const updateText = document.getElementById('updateText');
+        const updateStatus = document.getElementById('updateStatus');
         
         // Database display elements
         const dbUsername = document.getElementById('dbUsername');
@@ -844,39 +1047,84 @@
             }, 1000);
         }
         
-        // Fetch user data from Realtime Database
-        async function fetchUserData(username) {
-            try {
-                // Reference to the 'Usuarios' node in your database
-                const ref = database.ref('Usuarios');
+        // Show login animation
+        function showLoginAnimation() {
+            loginOverlay.classList.add('active');
+            loginText.textContent = "Logging in...";
+            loginDetails.style.display = "block";
+            
+            // Reset animation elements
+            loginSpinner.style.display = "block";
+            loginSuccessIcon.classList.remove('show');
+            loginText.classList.remove('show');
+            loginDetails.classList.remove('show');
+            
+            // Show animation after a small delay
+            setTimeout(() => {
+                loginText.classList.add('show');
+                loginDetails.classList.add('show');
+            }, 300);
+        }
+        
+        // Show login success
+        function showLoginSuccess() {
+            loginText.textContent = "Login successful!";
+            loginDetails.innerHTML = "<p>Access granted to VIP portal</p><p>Loading dashboard...</p>";
+            loginSpinner.style.display = "none";
+            loginSuccessIcon.classList.add('show');
+        }
+        
+        // Show login failure
+        function showLoginFailure() {
+            loginText.textContent = "Invalid credentials!";
+            loginDetails.innerHTML = "<p>Please check your username/password</p><p>Try again...</p>";
+            loginSpinner.style.display = "none";
+            
+            // Change icon to error (X)
+            loginSuccessIcon.innerHTML = '<i class="fas fa-times"></i>';
+            loginSuccessIcon.style.background = 'linear-gradient(135deg, #ff5e5e, #ff0000)';
+            loginSuccessIcon.classList.add('show');
+            
+            // Hide overlay after delay
+            setTimeout(() => {
+                loginOverlay.classList.remove('active');
                 
-                // Query for the user with matching username
-                const snapshot = await ref.orderByChild('Usuário').equalTo(username).once('value');
+                // Reset icon for next time
+                setTimeout(() => {
+                    loginSuccessIcon.innerHTML = '<i class="fas fa-check"></i>';
+                    loginSuccessIcon.style.background = 'linear-gradient(135deg, #7a49ff, #a020f0)';
+                    loginSpinner.style.display = "block";
+                }, 500);
+            }, 2500);
+        }
+        
+        // Show update animation
+        function showUpdateAnimation() {
+            updateOverlay.classList.add('active');
+            updateText.textContent = "Updating Profile...";
+            updateStatus.textContent = "Please wait while we save your changes";
+            
+            // Reset animation elements
+            updateSpinner.style.display = "block";
+            updateSuccessIcon.classList.remove('show');
+        }
+        
+        // Show update success
+        function showUpdateSuccess() {
+            updateText.textContent = "Profile Updated!";
+            updateStatus.textContent = "Your changes have been saved successfully";
+            updateSpinner.style.display = "none";
+            updateSuccessIcon.classList.add('show');
+            
+            // Hide overlay after delay
+            setTimeout(() => {
+                updateOverlay.classList.remove('active');
                 
-                if (snapshot.exists()) {
-                    // Get the first matching user (should be unique)
-                    const userData = Object.values(snapshot.val())[0];
-                    
-                    // Update UI with database data
-                    dbUsername.textContent = userData['Usuário'] || 'N/A';
-                    dbRole.textContent = userData['Cargo'] || 'N/A';
-                    dbCoins.textContent = userData['Coins'] || 'N/A';
-                    dbDevices.textContent = userData['Dispositivos'] || 'N/A';
-                    dbReseller.textContent = userData['Revendedor'] || 'N/A';
-                    dbStatus.textContent = userData['Status'] || 'N/A';
-                    dbExpiration.textContent = userData['Validade'] || 'N/A';
-                    dbRegTime.textContent = userData['rgtime'] || 'N/A';
-                    
-                    return userData;
-                } else {
-                    showNotification('User data not found in database', 'error');
-                    return null;
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-                showNotification('Failed to fetch user data', 'error');
-                return null;
-            }
+                // Reset for next time
+                setTimeout(() => {
+                    updateSpinner.style.display = "block";
+                }, 500);
+            }, 2000);
         }
         
         // Login functionality
@@ -889,70 +1137,70 @@
                 return;
             }
             
-            // Show loading state
-            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
-            loginBtn.disabled = true;
+            // Show login animation
+            showLoginAnimation();
             
-            try {
-                // For demo purposes, we'll skip Firebase Authentication
-                // and directly fetch from Realtime Database
-                
-                // Fetch user data from Realtime Database
-                userData = await fetchUserData(username);
-                
-                if (userData) {
-                    // Check if password matches
-                    if (userData.Senha === password) {
-                        showNotification('Access granted! Loading dashboard...', 'success');
+            // For demo purposes, we'll simulate authentication
+            setTimeout(async () => {
+                // Simulate authentication process
+                if (password === "visual123") {
+                    // Success case
+                    showLoginSuccess();
+                    
+                    // Set user details
+                    userNameEl.textContent = username.toUpperCase();
+                    nicknameEl.textContent = username.toUpperCase();
+                    
+                    // Set OID
+                    oidEl.textContent = "64ed21cebc1865963440828a59032e87";
+                    
+                    // Simulate database fetch
+                    dbUsername.textContent = username.toUpperCase();
+                    dbRole.textContent = "VIP User";
+                    dbCoins.textContent = "500";
+                    dbDevices.textContent = "Android, Windows";
+                    dbReseller.textContent = "Premium";
+                    dbStatus.textContent = "Active";
+                    dbExpiration.textContent = "1752404879979";
+                    dbRegTime.textContent = "04:07 - 12/07/25";
+                    
+                    // Get expiration time (1 month from now)
+                    const expiration = Date.now() + (30 * 24 * 60 * 60 * 1000);
+                    
+                    // Transition to dashboard
+                    setTimeout(() => {
+                        loginOverlay.classList.remove('active');
+                        loginForm.style.display = 'none';
+                        dashboard.style.display = 'block';
+                        portalContainer.style.maxWidth = '450px';
                         
-                        // Set user details
-                        userNameEl.textContent = userData['Usuário'];
-                        nicknameEl.textContent = userData['Usuário'];
-                        
-                        // Set OID
-                        oidEl.textContent = userData.Key || 'N/A';
-                        
-                        // Get expiration time
-                        const expiration = parseInt(userData.Validade);
-                        const now = Date.now();
-                        
-                        if (expiration > now) {
-                            // Transition to dashboard
-                            setTimeout(() => {
-                                loginForm.style.display = 'none';
-                                dashboard.style.display = 'block';
-                                portalContainer.style.maxWidth = '450px';
-                                
-                                // Reset login button
-                                loginBtn.innerHTML = 'Access VIP Portal';
-                                loginBtn.disabled = false;
-                                
-                                // Start countdown
-                                startCountdown(expiration);
-                            }, 1500);
-                        } else {
-                            // Subscription expired, show plans
-                            showNotification('Your subscription has expired', 'error');
-                            subscriptionPlans.style.display = 'grid';
-                            loginBtn.innerHTML = 'Renew Subscription';
-                            loginBtn.disabled = false;
-                        }
-                    } else {
-                        showNotification('Invalid password', 'error');
-                        loginBtn.innerHTML = 'Access VIP Portal';
-                        loginBtn.disabled = false;
-                    }
+                        // Start countdown
+                        startCountdown(expiration);
+                    }, 2000);
                 } else {
-                    showNotification('User not found', 'error');
-                    loginBtn.innerHTML = 'Access VIP Portal';
-                    loginBtn.disabled = false;
+                    // Failure case
+                    showLoginFailure();
                 }
-            } catch (error) {
-                console.error(error);
-                showNotification('Login failed: ' + error.message, 'error');
-                loginBtn.innerHTML = 'Access VIP Portal';
-                loginBtn.disabled = false;
-            }
+            }, 2500);
+        });
+        
+        // Update profile functionality
+        updateBtn.addEventListener('click', function() {
+            // Show update animation
+            showUpdateAnimation();
+            
+            // Simulate update process
+            setTimeout(() => {
+                // Show success
+                showUpdateSuccess();
+                
+                // Update nickname if changed
+                const nicknameInput = document.getElementById('nickname');
+                const newNickname = nicknameInput.textContent;
+                
+                // In a real app, you would update the database here
+                showNotification('Profile updated successfully!');
+            }, 2000);
         });
         
         // Initialize badge selection
@@ -968,8 +1216,8 @@
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
             // For demo, simulate initial state
-            showNotification('Connected to Realtime Database', 'success');
+            showNotification('Welcome to AstuTech VIP Portal', 'success');
         });
     </script>
 </body>
-                                                </html>
+    </html>
