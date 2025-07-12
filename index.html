@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON to Token Generator</title>
+    <title>JSON Account Extractor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -39,7 +39,7 @@
         
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             background: rgba(10, 15, 40, 0.92);
             border-radius: 20px;
             overflow: hidden;
@@ -199,13 +199,62 @@
             display: none;
         }
         
+        .accounts-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .accounts-table th {
+            background: linear-gradient(to right, #5c6bc0, #3949ab);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        
+        .accounts-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(92, 107, 192, 0.3);
+        }
+        
+        .accounts-table tr:nth-child(even) {
+            background: rgba(28, 37, 85, 0.3);
+        }
+        
+        .accounts-table tr:hover {
+            background: rgba(92, 107, 192, 0.2);
+        }
+        
+        .select-btn {
+            padding: 8px 15px;
+            background: rgba(92, 107, 192, 0.3);
+            border: 1px solid #5c6bc0;
+            border-radius: 6px;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .select-btn:hover {
+            background: rgba(92, 107, 192, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .selected-account {
+            background: rgba(28, 37, 85, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #5c6bc0;
+        }
+        
         .info-row {
             display: flex;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(28, 37, 85, 0.4);
-            border-radius: 10px;
-            border-left: 4px solid #5c6bc0;
+            margin-bottom: 15px;
         }
         
         .info-label {
@@ -310,6 +359,7 @@
             font-weight: 600;
             margin-top: 15px;
             font-size: 16px;
+            text-align: center;
         }
         
         @media (max-width: 768px) {
@@ -325,13 +375,9 @@
                 font-size: 28px;
             }
             
-            .info-row {
-                flex-direction: column;
-                gap: 8px;
-            }
-            
-            .info-label {
-                width: 100%;
+            .accounts-table {
+                display: block;
+                overflow-x: auto;
             }
         }
         
@@ -347,6 +393,11 @@
             .upload-text {
                 font-size: 18px;
             }
+            
+            .info-row {
+                flex-direction: column;
+                gap: 5px;
+            }
         }
     </style>
 </head>
@@ -359,12 +410,12 @@
         <div class="header">
             <div class="logo">
                 <div class="logo-icon">
-                    <i class="fas fa-file-code"></i>
+                    <i class="fas fa-user-lock"></i>
                 </div>
-                <div class="logo-text">JSON to Token</div>
+                <div class="logo-text">Account Extractor</div>
             </div>
             <div class="tagline">
-                Upload your JSON file to automatically extract UID and password. We'll generate your token securely and redirect you to the verification endpoint.
+                Upload your JSON file to extract UID and password information. Select an account to generate your token URL.
             </div>
         </div>
         
@@ -394,32 +445,52 @@
             
             <div class="card result-area" id="resultArea">
                 <div class="card-title">
-                    <i class="fas fa-key"></i> Extracted Information
+                    <i class="fas fa-users"></i> Accounts Found in JSON
                 </div>
                 
-                <div class="info-row">
-                    <div class="info-label">UID:</div>
-                    <div class="info-value" id="uidValue">Not extracted</div>
-                </div>
+                <table class="accounts-table" id="accountsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>UID</th>
+                            <th>Password</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="accountsBody">
+                        <!-- Accounts will be populated here -->
+                    </tbody>
+                </table>
                 
-                <div class="info-row">
-                    <div class="info-label">Password:</div>
-                    <div class="info-value" id="passwordValue">Not extracted</div>
+                <div class="selected-account" id="selectedAccount" style="display: none;">
+                    <div class="card-title">
+                        <i class="fas fa-user-check"></i> Selected Account
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">UID:</div>
+                        <div class="info-value" id="selectedUid"></div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Password:</div>
+                        <div class="info-value" id="selectedPassword">••••••••••••••••</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Token URL:</div>
+                        <div class="info-value" id="tokenUrl">https://jw-ttoken.vercel.app/token</div>
+                    </div>
+                    
+                    <button class="action-btn" id="generateBtn">
+                        <i class="fas fa-bolt"></i> Generate Token
+                    </button>
                 </div>
-                
-                <div class="info-row">
-                    <div class="info-label">Token URL:</div>
-                    <div class="info-value" id="urlValue">https://jw-ttoken.vercel.app/token</div>
-                </div>
-                
-                <button class="action-btn" id="generateBtn">
-                    <i class="fas fa-bolt"></i> Generate Token
-                </button>
             </div>
         </div>
         
         <div class="footer">
-            &copy; 2023 JSON to Token Generator | Secure and Fast Token Processing
+            &copy; 2023 JSON Account Extractor | Secure and Easy to Use
         </div>
     </div>
 
@@ -431,18 +502,18 @@
         const fileName = document.getElementById('fileName');
         const loading = document.getElementById('loading');
         const resultArea = document.getElementById('resultArea');
-        const uidValue = document.getElementById('uidValue');
-        const passwordValue = document.getElementById('passwordValue');
-        const urlValue = document.getElementById('urlValue');
+        const accountsBody = document.getElementById('accountsBody');
+        const selectedAccount = document.getElementById('selectedAccount');
+        const selectedUid = document.getElementById('selectedUid');
+        const selectedPassword = document.getElementById('selectedPassword');
+        const tokenUrl = document.getElementById('tokenUrl');
         const generateBtn = document.getElementById('generateBtn');
         const notification = document.getElementById('notification');
         const notificationText = document.getElementById('notification-text');
         
-        // Extracted data
-        let extractedData = {
-            uid: '',
-            password: ''
-        };
+        // Current data
+        let accounts = [];
+        let selectedAccountData = null;
         
         // Show notification
         function showNotification(message, type = 'success') {
@@ -504,64 +575,128 @@
             fileName.textContent = `Selected file: ${file.name}`;
             loading.style.display = 'block';
             
-            // Simulate processing delay
-            setTimeout(() => {
-                const reader = new FileReader();
-                
-                reader.onload = (e) => {
-                    try {
-                        const jsonData = JSON.parse(e.target.result);
-                        
-                        // Extract uid and password
-                        extractedData.uid = jsonData.uid || '';
-                        extractedData.password = jsonData.password || '';
-                        
-                        if (!extractedData.uid || !extractedData.password) {
-                            showNotification('UID or Password not found in JSON', 'error');
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                try {
+                    const jsonData = JSON.parse(e.target.result);
+                    
+                    // Reset previous data
+                    accounts = [];
+                    accountsBody.innerHTML = '';
+                    selectedAccount.style.display = 'none';
+                    selectedAccountData = null;
+                    
+                    // Check if it's an array of accounts
+                    if (Array.isArray(jsonData)) {
+                        accounts = jsonData;
+                        if (accounts.length === 0) {
+                            showNotification('No accounts found in JSON file', 'error');
                             loading.style.display = 'none';
                             return;
                         }
                         
-                        // Update UI
-                        uidValue.textContent = extractedData.uid;
-                        passwordValue.textContent = '*'.repeat(extractedData.password.length);
-                        urlValue.textContent = `https://jw-ttoken.vercel.app/token?uid=${extractedData.uid}&password=${extractedData.password}`;
+                        // Populate accounts table
+                        accounts.forEach((account, index) => {
+                            const row = document.createElement('tr');
+                            
+                            row.innerHTML = `
+                                <td>${index + 1}</td>
+                                <td>${account.uid || 'N/A'}</td>
+                                <td>${account.password ? '*'.repeat(16) : 'N/A'}</td>
+                                <td><button class="select-btn" data-index="${index}">Select</button></td>
+                            `;
+                            
+                            accountsBody.appendChild(row);
+                        });
+                        
+                        // Add event listeners to select buttons
+                        document.querySelectorAll('.select-btn').forEach(btn => {
+                            btn.addEventListener('click', (e) => {
+                                const index = parseInt(e.target.dataset.index);
+                                selectAccount(index);
+                            });
+                        });
                         
                         // Show results
                         loading.style.display = 'none';
                         resultArea.style.display = 'block';
                         
-                        showNotification('JSON file processed successfully!');
-                    } catch (error) {
-                        showNotification('Error parsing JSON file', 'error');
+                        showNotification(`${accounts.length} accounts found in JSON file`);
+                    } else if (jsonData.uid && jsonData.password) {
+                        // Single account object
+                        accounts = [jsonData];
+                        selectAccount(0);
+                        
+                        // Show results
                         loading.style.display = 'none';
-                        console.error(error);
+                        resultArea.style.display = 'block';
+                        
+                        showNotification('Account data extracted successfully!');
+                    } else {
+                        showNotification('Invalid JSON format. Expected array of accounts or single account object.', 'error');
+                        loading.style.display = 'none';
                     }
-                };
+                } catch (error) {
+                    showNotification('Error parsing JSON file', 'error');
+                    loading.style.display = 'none';
+                    console.error(error);
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        // Select an account
+        function selectAccount(index) {
+            if (index >= 0 && index < accounts.length) {
+                selectedAccountData = accounts[index];
                 
-                reader.readAsText(file);
-            }, 1500);
+                // Update selected account UI
+                selectedUid.textContent = selectedAccountData.uid || 'N/A';
+                tokenUrl.textContent = `https://jw-ttoken.vercel.app/token?uid=${selectedAccountData.uid}&password=${selectedAccountData.password}`;
+                
+                // Show selected account section
+                selectedAccount.style.display = 'block';
+                
+                // Scroll to selected account
+                selectedAccount.scrollIntoView({ behavior: 'smooth' });
+            }
         }
         
         // Generate token
         generateBtn.addEventListener('click', () => {
-            if (!extractedData.uid || !extractedData.password) {
-                showNotification('No data to generate token', 'error');
+            if (!selectedAccountData || !selectedAccountData.uid || !selectedAccountData.password) {
+                showNotification('No account selected or account data incomplete', 'error');
                 return;
             }
             
             showNotification('Redirecting to token generator...');
             
-            // Simulate delay before redirect
+            // Redirect to token URL
             setTimeout(() => {
-                window.location.href = `https://jw-ttoken.vercel.app/token?uid=${extractedData.uid}&password=${extractedData.password}`;
+                window.location.href = `https://jw-ttoken.vercel.app/token?uid=${selectedAccountData.uid}&password=${selectedAccountData.password}`;
             }, 1000);
         });
         
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             showNotification('Upload a JSON file to get started');
+            
+            // Sample JSON for demo
+            const sampleJson = [
+                {
+                    "uid": "2913572999",
+                    "password": "6D3C50E17A88F620A8E079C99A36928ECD36CAE19361FBFB7662F8955525F4D0"
+                },
+                {
+                    "uid": "3999507077",
+                    "password": "53DE08589A4292FA961CBFD4CB53B9AA2CFA42FC55E2112AC82D7D91ABA635AF"
+                }
+            ];
+            
+            console.log('Sample JSON format:', JSON.stringify(sampleJson, null, 2));
         });
     </script>
 </body>
-</html>
+    </html>
