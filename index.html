@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DARK LIKE – Secur</title>
+    <title>AstuTech VIP Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
-        /* Your original CSS remains the same */
         * {
             margin: 0;
             padding: 0;
@@ -14,537 +17,941 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0a0a0a, #000000);
-            color: white;
+            background: linear-gradient(135deg, #071e48 0%, #0a2a5f 100%);
             min-height: 100vh;
+            color: #ffffff;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             padding: 20px;
             overflow-x: hidden;
-        }
-        
-        .container {
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 15px;
-            padding: 30px;
-            width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-            border: 1px solid #333333;
-            text-align: center;
-            margin-top: 20px;
             position: relative;
-            overflow: hidden;
         }
         
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #ff0000;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
-        }
-        
-        .domain {
-            color: #aaaaaa;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-        
-        .language-selector {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .language-btn {
-            background: transparent;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-weight: bold;
-            border-bottom: 2px solid transparent;
-            transition: all 0.3s;
-        }
-        
-        .language-btn.active {
-            border-bottom: 2px solid #ff0000;
-            color: #ff0000;
-        }
-        
-        .language-btn:hover {
-            color: #ff0000;
-        }
-        
-        .start-btn {
-            background: linear-gradient(45deg, #ff0000, #990000);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 18px;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 20px 0;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(255, 0, 0, 0.4);
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .start-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(255, 0, 0, 0.6);
-        }
-        
-        .start-btn:active {
-            transform: translateY(1px);
-        }
-        
-        .start-btn::after {
+        body::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0) 45%,
-                rgba(255, 255, 255, 0.5) 50%,
-                rgba(255, 255, 255, 0) 55%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(30deg);
-            animation: shine 3s infinite;
-        }
-        
-        @keyframes shine {
-            0% {
-                left: -50%;
-            }
-            100% {
-                left: 150%;
-            }
-        }
-        
-        .region-selection {
-            margin: 20px 0;
-        }
-        
-        .region-title {
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .region-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .region-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid #333333;
-            color: white;
-            padding: 8px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .region-btn:hover, .region-btn.active {
-            background: #ff0000;
-            color: black;
-            border-color: #ff0000;
-        }
-        
-        .uid-input {
-            width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border-radius: 5px;
-            border: none;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 16px;
-        }
-        
-        .uid-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .unlock-btn {
-            background: linear-gradient(45deg, #990000, #ff0000);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 10px 0;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(153, 0, 0, 0.4);
-            transition: all 0.3s;
-            width: 100%;
-        }
-        
-        .unlock-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(153, 0, 0, 0.6);
-        }
-        
-        .token-timer {
-            color: #ff0000;
-            margin: 15px 0;
-            font-size: 14px;
-        }
-        
-        .how-to-use {
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 30px;
-            text-align: left;
-        }
-        
-        .how-to-use h3 {
-            margin-bottom: 15px;
-            color: #ff0000;
-        }
-        
-        .how-to-use ol {
-            padding-left: 20px;
-        }
-        
-        .how-to-use li {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-        
-        .community-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .community-btn {
-            background: #0088cc;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.3s;
-            text-decoration: none;
-            width: 100%;
-            max-width: 250px;
-            justify-content: center;
-        }
-        
-        .community-btn.vip {
-            background: linear-gradient(45deg, #990000, #ff0000);
-        }
-        
-        .community-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        /* Dark Like Intro Animation */
-        .intro-animation {
-            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 1000;
-            animation: fadeOut 1s ease-in-out 2s forwards;
+            background: radial-gradient(circle at 10% 20%, rgba(56, 113, 209, 0.1) 0%, transparent 20%),
+                        radial-gradient(circle at 90% 80%, rgba(122, 73, 255, 0.1) 0%, transparent 20%);
+            z-index: -1;
         }
         
-        .intro-text {
-            font-size: 48px;
-            font-weight: bold;
-            color: #ff0000;
-            text-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
-            animation: pulse 1.5s infinite alternate;
-            margin-bottom: 20px;
-        }
-        
-        /* New styles for results page */
-        .results-box {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #ff0000;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            font-family: 'Courier New', monospace;
-            text-align: left;
-            white-space: pre;
-        }
-        
-        .back-btn {
-            background: linear-gradient(45deg, #333333, #666666);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-            font-weight: bold;
+        .vip-portal {
             width: 100%;
-            transition: all 0.3s;
+            max-width: 450px;
+            background: rgba(4, 12, 31, 0.92);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(56, 113, 209, 0.4);
+            position: relative;
+            z-index: 10;
         }
         
-        .back-btn:hover {
-            background: linear-gradient(45deg, #444444, #777777);
+        .portal-header {
+            background: linear-gradient(to right, #040c1f, #071e48);
+            padding: 25px 20px 20px;
+            text-align: center;
+            border-bottom: 2px solid #7a49ff;
+            position: relative;
+            overflow: hidden;
         }
         
-        @keyframes pulse {
-            from {
-                transform: scale(1);
-                opacity: 1;
+        .portal-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #7a49ff, #a020f0);
+        }
+        
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #7a49ff, #a020f0);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 0 20px rgba(122, 73, 255, 0.5);
+        }
+        
+        .logo-text {
+            font-size: 32px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #7a49ff, #a020f0);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(122, 73, 255, 0.4);
+        }
+        
+        .tagline {
+            color: #a0b1cb;
+            font-size: 14px;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Login Screen */
+        .login-form {
+            padding: 30px 25px;
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-label {
+            display: block;
+            color: #a0b1cb;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(7, 30, 72, 0.7);
+            border: 1px solid rgba(42, 74, 138, 0.7);
+            border-radius: 12px;
+            color: #ffffff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #7a49ff;
+            box-shadow: 0 0 0 3px rgba(122, 73, 255, 0.3);
+        }
+        
+        .input-field::placeholder {
+            color: #5d7aaf;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            color: #a0b1cb;
+            cursor: pointer;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(to right, #7a49ff, #a020f0);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(122, 73, 255, 0.4);
+            margin-top: 10px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(122, 73, 255, 0.6);
+        }
+        
+        .login-btn:active {
+            transform: translateY(1px);
+        }
+        
+        /* Dashboard Screen */
+        .dashboard {
+            display: none;
+            padding: 0;
+        }
+        
+        .welcome-box {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(7, 30, 72, 0.6);
+            border-bottom: 1px solid rgba(56, 113, 209, 0.4);
+        }
+        
+        .welcome-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .welcome-text span {
+            color: #7a49ff;
+            font-weight: 700;
+        }
+        
+        .countdown {
+            color: #ff5e5e;
+            font-weight: 700;
+            font-size: 15px;
+            background: rgba(255, 94, 94, 0.1);
+            padding: 6px 12px;
+            border-radius: 8px;
+            letter-spacing: 1px;
+        }
+        
+        .dashboard-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .info-section {
+            background: rgba(7, 30, 72, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(56, 113, 209, 0.4);
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        
+        .info-label {
+            color: #a0b1cb;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            width: 140px;
+            flex-shrink: 0;
+        }
+        
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+            color: #ffffff;
+            flex-grow: 1;
+        }
+        
+        .platform-tag {
+            display: inline-block;
+            background: rgba(56, 113, 209, 0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            background: rgba(7, 30, 72, 0.6);
+            border: 1px solid rgba(56, 113, 209, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+            color: #a0b1cb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .action-btn:hover {
+            background: rgba(122, 73, 255, 0.1);
+            border-color: #7a49ff;
+            transform: translateY(-3px);
+        }
+        
+        .action-btn i {
+            font-size: 20px;
+            margin-bottom: 8px;
+            color: #7a49ff;
+        }
+        
+        .customization-section {
+            background: rgba(7, 30, 72, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(56, 113, 209, 0.4);
+        }
+        
+        .section-title {
+            color: #7a49ff;
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            color: #a0b1cb;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        
+        .custom-input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(4, 12, 31, 0.7);
+            border: 1px solid rgba(56, 113, 209, 0.4);
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-input:focus {
+            outline: none;
+            border-color: #7a49ff;
+            box-shadow: 0 0 0 2px rgba(122, 73, 255, 0.3);
+        }
+        
+        .badge-selector {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .badge-option {
+            flex: 1;
+            background: rgba(4, 12, 31, 0.7);
+            border: 1px solid rgba(56, 113, 209, 0.4);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+        
+        .badge-option:hover, .badge-option.active {
+            background: rgba(122, 73, 255, 0.2);
+            border-color: #7a49ff;
+        }
+        
+        .badge-option i {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #7a49ff;
+        }
+        
+        .badge-option.active i {
+            color: #ffd700;
+        }
+        
+        .update-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to right, #7a49ff, #a020f0);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(122, 73, 255, 0.4);
+            margin-top: 10px;
+        }
+        
+        .update-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(122, 73, 255, 0.6);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #a0b1cb;
+            font-size: 12px;
+            border-top: 1px solid rgba(56, 113, 209, 0.4);
+            background: rgba(4, 12, 31, 0.5);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(4, 12, 31, 0.92);
+            border-left: 4px solid #7a49ff;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(120%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .promo-section {
+            background: rgba(122, 73, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid #7a49ff;
+        }
+        
+        .promo-title {
+            color: #7a49ff;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .subscription-plans {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .plan-card {
+            background: rgba(7, 30, 72, 0.4);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(56, 113, 209, 0.4);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .plan-card:hover {
+            border-color: #7a49ff;
+            transform: translateY(-3px);
+        }
+        
+        .plan-card.selected {
+            border-color: #7a49ff;
+            background: rgba(122, 73, 255, 0.1);
+        }
+        
+        .plan-title {
+            color: #7a49ff;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .plan-price {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .plan-duration {
+            color: #a0b1cb;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 480px) {
+            .vip-portal {
+                border-radius: 15px;
             }
-            to {
-                transform: scale(1.1);
-                opacity: 0.8;
+            
+            .portal-header {
+                padding: 20px 15px;
+            }
+            
+            .logo-text {
+                font-size: 26px;
+            }
+            
+            .login-form, .dashboard-content {
+                padding: 20px 15px;
+            }
+            
+            .info-row {
+                flex-direction: column;
+                gap: 5px;
+                margin-bottom: 12px;
+            }
+            
+            .info-label {
+                width: 100%;
+            }
+            
+            .subscription-plans {
+                grid-template-columns: 1fr;
             }
         }
         
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                visibility: hidden;
-            }
+        /* Scrollbar styling */
+        .dashboard-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .dashboard-content::-webkit-scrollbar-track {
+            background: rgba(4, 12, 31, 0.5);
+            border-radius: 10px;
+        }
+        
+        .dashboard-content::-webkit-scrollbar-thumb {
+            background: #7a49ff;
+            border-radius: 10px;
+        }
+        
+        .dashboard-content::-webkit-scrollbar-thumb:hover {
+            background: #a020f0;
         }
     </style>
 </head>
 <body>
-    <!-- Dark Like Intro Animation -->
-    <div class="intro-animation" id="intro-animation">
-        <div class="intro-text">DARK LIKE</div>
-        <div style="color: #888;">Loading...</div>
-    </div>
-
-    <div class="container" id="main-page">
-        <div class="logo">DARK LIKE – Secur</div>
-        <div class="domain">darklike.ff</div>
-        
-        <div class="language-selector">
-            <button class="language-btn active">English</button>
-            <button class="language-btn">हिंदी</button>
-            <button class="language-btn">Português</button>
-            <button class="language-btn">Español</button>
-        </div>
-        
-        <button class="start-btn" id="start-btn">START</button>
-        
-        <div class="how-to-use">
-            <h3>How to Use:</h3>
-            <ol>
-                <li><strong>Step 1:</strong> Click the "Start" button. A new tab will open — just skip it and return here to access the dashboard directly.</li>
-                <li><strong>Step 2:</strong> Enter your Region and UID in the fields provided.</li>
-                <li><strong>Step 3:</strong> Click the "Unlock" button. Again, skip the new tab and come back to the dashboard.</li>
-                <li><strong>Step 4:</strong> Within 3 seconds, the Send Like button will appear — click it to get free likes!</li>
-            </ol>
-        </div>
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i> <span id="notification-text">Successfully logged in!</span>
     </div>
     
-    <div class="container hidden" id="dashboard-page">
-        <div class="logo">DARK LIKE – Secur</div>
-        <div class="domain">darklike.ff</div>
-        
-        <div class="language-selector">
-            <button class="language-btn active">English</button>
-            <button class="language-btn">हिंदी</button>
-            <button class="language-btn">Português</button>
-            <button class="language-btn">Español</button>
+    <div class="vip-portal" id="portalContainer">
+        <!-- Header -->
+        <div class="portal-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="logo-text">ASTUTECH VIP</div>
+            </div>
+            <div class="tagline">CONTROL YOUR ACCOUNT ANYTIME, ANYWHERE</div>
         </div>
         
-        <div class="region-selection">
-            <div class="region-title">Select Your Region</div>
-            <div class="region-grid" id="region-grid">
-                <button class="region-btn" data-code="SG">SG</button>
-                <button class="region-btn" data-code="IND">IND</button>
-                <button class="region-btn" data-code="ID">ID</button>
-                <button class="region-btn" data-code="ME">ME</button>
-                <button class="region-btn" data-code="BR">BR</button>
-                <button class="region-btn" data-code="VN">VN</button>
-                <button class="region-btn" data-code="BD">BD</button>
-                <button class="region-btn" data-code="EU">EU</button>
-                <button class="region-btn" data-code="TH">TH</button>
-                <button class="region-btn" data-code="SAC">SAC</button>
-                <button class="region-btn" data-code="NA">NA</button>
+        <!-- Login Form -->
+        <div class="login-form" id="loginForm">
+            <div class="form-group">
+                <label class="form-label">Username</label>
+                <input type="text" class="input-field" placeholder="Enter admin username" id="username">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" class="input-field" placeholder="Enter admin password" id="password">
+                <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+            </div>
+            
+            <button class="login-btn" id="loginBtn">Access VIP Portal</button>
+            
+            <div class="subscription-plans" id="subscriptionPlans" style="display: none; margin-top: 25px;">
+                <div class="plan-card" data-duration="1">
+                    <div class="plan-title">24 Hours</div>
+                    <div class="plan-price">$9.99</div>
+                    <div class="plan-duration">Full Access</div>
+                </div>
+                <div class="plan-card" data-duration="7">
+                    <div class="plan-title">7 Days</div>
+                    <div class="plan-price">$49.99</div>
+                    <div class="plan-duration">Premium Access</div>
+                </div>
+                <div class="plan-card" data-duration="15">
+                    <div class="plan-title">15 Days</div>
+                    <div class="plan-price">$89.99</div>
+                    <div class="plan-duration">Extended Access</div>
+                </div>
+                <div class="plan-card" data-duration="30">
+                    <div class="plan-title">30 Days</div>
+                    <div class="plan-price">$149.99</div>
+                    <div class="plan-duration">VIP Access</div>
+                </div>
             </div>
         </div>
         
-        <input type="text" class="uid-input" id="uid-input" placeholder="Enter your UID">
-        
-        <button class="unlock-btn" id="unlock-btn">Click to unlock Send likes button</button>
-        
-        <div class="token-timer hidden" id="token-timer">Processing...</div>
-        
-        <div class="community-links">
-            <a href="https://t.me/DARKISBACKPROXY" class="community-btn" target="_blank">
-                JOIN TELEGRAM PROXY
-            </a>
-            <a href="https://t.me/DARK_VVIP_GROUP" class="community-btn vip" target="_blank">
-                JOIN TELEGRAM VIP
-            </a>
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <div class="welcome-box">
+                <div class="welcome-text">Welcome, <span id="userName">VIPUSER</span>!</div>
+                <div class="countdown" id="countdown">70h 53m 59s</div>
+            </div>
+            
+            <div class="dashboard-content">
+                <div class="info-section">
+                    <div class="info-row">
+                        <div class="info-label">OID:</div>
+                        <div class="info-value" id="oid">64ed21cebc1865963440828a59032e87</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">BOUND PLATFORM:</div>
+                        <div class="info-value">
+                            <span class="platform-tag">Google</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">RECENT ACCESS:</div>
+                        <div class="info-value">iOS (iPhone)</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">SERVER:</div>
+                        <div class="info-value">IP: 3.108.240.67 | Port: 1001</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">LAST LOGIN:</div>
+                        <div class="info-value">2025-03-17 00:52:10 UTC</div>
+                    </div>
+                </div>
+                
+                <div class="actions-grid">
+                    <div class="action-btn">
+                        <i class="fas fa-envelope"></i>
+                        Mails
+                    </div>
+                    <div class="action-btn">
+                        <i class="fas fa-user-friends"></i>
+                        Friends
+                    </div>
+                    <div class="action-btn">
+                        <i class="fas fa-clone"></i>
+                        Clone
+                    </div>
+                    <div class="action-btn">
+                        <i class="fas fa-exchange-alt"></i>
+                        Switch Account
+                    </div>
+                </div>
+                
+                <div class="customization-section">
+                    <div class="promo-section">
+                        <div class="promo-title">PROFILE CUSTOMIZATION</div>
+                        <div class="info-row">
+                            <div class="info-label">NICKNAME:</div>
+                            <div class="info-value" id="nickname">VIPUSER</div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Gold</label>
+                        <input type="text" class="custom-input" value="1341742864">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Diamonds</label>
+                        <input type="text" class="custom-input" placeholder="Enter diamond amount">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Badge</label>
+                        <div class="badge-selector">
+                            <div class="badge-option active">
+                                <i class="fas fa-times"></i>
+                                <div>None</div>
+                            </div>
+                            <div class="badge-option">
+                                <i class="fas fa-crown"></i>
+                                <div>VIP</div>
+                            </div>
+                            <div class="badge-option">
+                                <i class="fas fa-star"></i>
+                                <div>Prime</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Level</label>
+                        <input type="number" class="custom-input" placeholder="Enter level" min="1" max="100">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Likes</label>
+                        <input type="number" class="custom-input" placeholder="Enter likes count" min="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Custom ID</label>
+                        <input type="text" class="custom-input" placeholder="Enter custom ID">
+                    </div>
+                    
+                    <button class="update-btn">Update Profile</button>
+                </div>
+            </div>
         </div>
-    </div>
-    
-    <!-- Results Page -->
-    <div class="container hidden" id="results-page">
-        <div class="logo">DARK LIKE – Results</div>
         
-        <div class="results-box" id="results-box">
-            <!-- Results will be displayed here -->
+        <!-- Footer -->
+        <div class="footer">
+            &copy; 2025 AstuTech VIP Server. All rights reserved.
         </div>
-        
-        <button class="back-btn" id="back-btn">Back to Dashboard</button>
     </div>
 
     <script>
-        // Show intro animation first
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                document.getElementById('intro-animation').style.display = 'none';
-            }, 3000);
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBOg09RLtzrpwingJzcFxWxyQa-jPHUN_o",
+            authDomain: "visual-cc58b.firebaseapp.com",
+            projectId: "visual-cc58b",
+            storageBucket: "visual-cc58b.firebasestorage.app",
+            messagingSenderId: "236633699332",
+            appId: "1:236633699332:web:d71195b26b1c4ade21f151",
+            measurementId: "G-RT732Q3YN8"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const dashboard = document.getElementById('dashboard');
+        const loginBtn = document.getElementById('loginBtn');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const passwordInput = document.getElementById('password');
+        const usernameInput = document.getElementById('username');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        const countdownEl = document.getElementById('countdown');
+        const oidEl = document.getElementById('oid');
+        const userNameEl = document.getElementById('userName');
+        const nicknameEl = document.getElementById('nickname');
+        const portalContainer = document.getElementById('portalContainer');
+        const subscriptionPlans = document.getElementById('subscriptionPlans');
+        const planCards = document.querySelectorAll('.plan-card');
+        
+        // Variables
+        let selectedPlan = null;
+        let currentUser = null;
+        let subscriptionEnd = null;
+        
+        // Password toggle
+        passwordToggle.addEventListener('click', () => {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordToggle.classList.remove('fa-eye');
+                passwordToggle.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordToggle.classList.remove('fa-eye-slash');
+                passwordToggle.classList.add('fa-eye');
+            }
         });
         
-        // DOM elements
-        const startBtn = document.getElementById('start-btn');
-        const mainPage = document.getElementById('main-page');
-        const dashboardPage = document.getElementById('dashboard-page');
-        const resultsPage = document.getElementById('results-page');
-        const regionGrid = document.getElementById('region-grid');
-        const uidInput = document.getElementById('uid-input');
-        const unlockBtn = document.getElementById('unlock-btn');
-        const tokenTimer = document.getElementById('token-timer');
-        const resultsBox = document.getElementById('results-box');
-        const backBtn = document.getElementById('back-btn');
+        // Plan selection
+        planCards.forEach(card => {
+            card.addEventListener('click', () => {
+                planCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedPlan = parseInt(card.dataset.duration);
+            });
+        });
         
-        // Switch between main page and dashboard
-        startBtn.addEventListener('click', function() {
-            // Open a new tab (you can replace this with your actual link)
-            window.open('https://freefire.com', '_blank');
+        // Show notification
+        function showNotification(message, type = 'success') {
+            notificationText.textContent = message;
+            const color = type === 'success' ? '#7a49ff' : '#ff5e5e';
+            notification.style.borderLeftColor = color;
+            notification.classList.add('show');
             
-            // Show dashboard after a short delay to simulate the "skip and return" experience
             setTimeout(() => {
-                mainPage.classList.add('hidden');
-                dashboardPage.classList.remove('hidden');
-            }, 500);
-        });
+                notification.classList.remove('show');
+            }, 3000);
+        }
         
-        // Language selector functionality
-        const languageBtns = document.querySelectorAll('.language-btn');
-        languageBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                languageBtns.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-            });
-        });
+        // Generate random OID
+        function generateOID() {
+            const chars = '0123456789abcdef';
+            let oid = '';
+            for (let i = 0; i < 32; i++) {
+                oid += chars[Math.floor(Math.random() * chars.length)];
+            }
+            oidEl.textContent = oid;
+        }
         
-        // Region selection
-        let selectedCountry = null;
-        document.querySelectorAll('.region-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                selectedCountry = this.dataset.code;
-            });
-        });
+        // Start countdown timer
+        function startCountdown(endTime) {
+            const timer = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+                
+                if (distance < 0) {
+                    clearInterval(timer);
+                    countdownEl.innerHTML = 'ACCESS EXPIRED';
+                    countdownEl.style.color = '#ff5e5e';
+                    return;
+                }
+                
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                countdownEl.textContent = `${hours}h ${minutes}m ${seconds}s`;
+            }, 1000);
+        }
         
-        // Unlock button functionality with API call
-        unlockBtn.addEventListener('click', async function() {
-            if (!selectedCountry) {
-                alert('Please select a region first');
+        // Login functionality
+        loginBtn.addEventListener('click', async () => {
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+            
+            if (!username || !password) {
+                showNotification('Please enter both username and password', 'error');
                 return;
             }
             
-            const uid = uidInput.value.trim();
-            if (!uid) {
-                alert('Please enter your UID');
-                return;
-            }
-            
-            // Show processing
-            unlockBtn.disabled = true;
-            tokenTimer.classList.remove('hidden');
+            // Show loading state
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            loginBtn.disabled = true;
             
             try {
-                // Call your API
-                const apiUrl = `https://like-bot-api-og.vercel.app/like?uid=${uid}&server_name=${selectedCountry}&key=grizly`;
-                const response = await fetch(apiUrl);
+                // Sign in with Firebase
+                const userCredential = await auth.signInWithEmailAndPassword(username + '@astutech.com', password);
+                currentUser = userCredential.user;
                 
-                if (response.ok) {
-                    const data = await response.json();
+                // Get user data from Firestore
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
                     
-                    // Display results
-                    dashboardPage.classList.add('hidden');
-                    resultsPage.classList.remove('hidden');
+                    // Check if subscription is active
+                    const now = new Date();
+                    const endTime = userData.subscriptionEnd.toDate();
                     
-                    // Format the results as requested
-                    resultsBox.innerHTML = `🚀 UID Validated - API Connected
-
-🆔 | UID: ${uid}
-👤 | Name: ${data.name || 'Player' + Math.floor(Math.random() * 10000)}
-🏆 | Level: ${data.level || Math.floor(Math.random() * 100)}
-🌍 | Region: ${selectedCountry}
-
-📝 Likes Info
-
-🐥 | Likes Before: ${data.likes_before || Math.floor(Math.random() * 500)}
-🐲 | Likes After: ${data.likes_after || Math.floor(Math.random() * 1000 + 500)}
-✨ | Likes Given: ${data.likes_given || Math.floor(Math.random() * 200 + 50)}
-
-👤 | Requested By: @UNKNOWN`;
+                    if (endTime > now) {
+                        // Subscription is active, show dashboard
+                        showNotification('Access granted! Loading dashboard...', 'success');
+                        
+                        // Set user details
+                        userNameEl.textContent = userData.displayName;
+                        nicknameEl.textContent = userData.displayName;
+                        
+                        // Set OID
+                        oidEl.textContent = userData.oid || generateOID();
+                        
+                        // Transition to dashboard
+                        setTimeout(() => {
+                            loginForm.style.display = 'none';
+                            dashboard.style.display = 'block';
+                            portalContainer.style.maxWidth = '450px';
+                            
+                            // Reset login button
+                            loginBtn.innerHTML = 'Access VIP Portal';
+                            loginBtn.disabled = false;
+                            
+                            // Start countdown
+                            startCountdown(endTime.getTime());
+                        }, 1500);
+                    } else {
+                        // Subscription expired, show plans
+                        showNotification('Your subscription has expired', 'error');
+                        subscriptionPlans.style.display = 'grid';
+                        loginBtn.innerHTML = 'Renew Subscription';
+                        loginBtn.disabled = false;
+                    }
                 } else {
-                    throw new Error('API request failed');
+                    // User not found in Firestore
+                    showNotification('User data not found', 'error');
+                    loginBtn.innerHTML = 'Access VIP Portal';
+                    loginBtn.disabled = false;
                 }
             } catch (error) {
-                dashboardPage.classList.add('hidden');
-                resultsPage.classList.remove('hidden');
-                resultsBox.innerHTML = `❌ Error: Failed to connect to API\n\nPlease try again later.`;
-            } finally {
-                unlockBtn.disabled = false;
-                tokenTimer.classList.add('hidden');
+                console.error(error);
+                showNotification('Login failed: ' + error.message, 'error');
+                loginBtn.innerHTML = 'Access VIP Portal';
+                loginBtn.disabled = false;
             }
         });
         
-        // Back button functionality
-        backBtn.addEventListener('click', function() {
-            resultsPage.classList.add('hidden');
-            dashboardPage.classList.remove('hidden');
+        // Initialize badge selection
+        document.querySelectorAll('.badge-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.badge-option').forEach(el => {
+                    el.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            generateOID();
             
-            // Reset form
-            document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
-            uidInput.value = '';
-            selectedCountry = null;
+            // Check if user is already logged in
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    currentUser = user;
+                    
+                    // Get user data from Firestore
+                    db.collection('users').doc(user.uid).get().then(doc => {
+                        if (doc.exists) {
+                            const userData = doc.data();
+                            
+                            // Set user details
+                            userNameEl.textContent = userData.displayName;
+                            nicknameEl.textContent = userData.displayName;
+                            
+                            // Set OID
+                            oidEl.textContent = userData.oid || generateOID();
+                            
+                            // Check subscription
+                            const now = new Date();
+                            const endTime = userData.subscriptionEnd.toDate();
+                            
+                            if (endTime > now) {
+                                // Show dashboard
+                                loginForm.style.display = 'none';
+                                dashboard.style.display = 'block';
+                                portalContainer.style.maxWidth = '450px';
+                                
+                                // Start countdown
+                                startCountdown(endTime.getTime());
+                            } else {
+                                // Show subscription plans
+                                subscriptionPlans.style.display = 'grid';
+                                loginBtn.innerHTML = 'Renew Subscription';
+                            }
+                        }
+                    });
+                }
+            });
         });
     </script>
 </body>
-</html>
+    </html>
