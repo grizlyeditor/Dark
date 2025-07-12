@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script> <!-- Changed to Realtime Database -->
     <style>
         * {
             margin: 0;
@@ -566,12 +566,12 @@
         <div class="login-form" id="loginForm">
             <div class="form-group">
                 <label class="form-label">Username</label>
-                <input type="text" class="input-field" placeholder="Enter admin username" id="username">
+                <input type="text" class="input-field" placeholder="Enter your username" id="username">
             </div>
             
             <div class="form-group">
                 <label class="form-label">Password</label>
-                <input type="password" class="input-field" placeholder="Enter admin password" id="password">
+                <input type="password" class="input-field" placeholder="Enter your password" id="password">
                 <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
             </div>
             
@@ -611,30 +611,48 @@
             <div class="dashboard-content">
                 <div class="info-section">
                     <div class="info-row">
-                        <div class="info-label">OID:</div>
+                        <div class="info-label">USER ID:</div>
                         <div class="info-value" id="oid">64ed21cebc1865963440828a59032e87</div>
                     </div>
                     
                     <div class="info-row">
-                        <div class="info-label">BOUND PLATFORM:</div>
-                        <div class="info-value">
-                            <span class="platform-tag">Google</span>
-                        </div>
+                        <div class="info-label">USERNAME:</div>
+                        <div class="info-value" id="dbUsername">VISUAL</div>
                     </div>
                     
                     <div class="info-row">
-                        <div class="info-label">RECENT ACCESS:</div>
-                        <div class="info-value">iOS (iPhone)</div>
+                        <div class="info-label">ROLE:</div>
+                        <div class="info-value" id="dbRole">Usuário</div>
                     </div>
                     
                     <div class="info-row">
-                        <div class="info-label">SERVER:</div>
-                        <div class="info-value">IP: 3.108.240.67 | Port: 1001</div>
+                        <div class="info-label">COINS:</div>
+                        <div class="info-value" id="dbCoins">O</div>
                     </div>
                     
                     <div class="info-row">
-                        <div class="info-label">LAST LOGIN:</div>
-                        <div class="info-value">2025-03-17 00:52:10 UTC</div>
+                        <div class="info-label">DEVICES:</div>
+                        <div class="info-value" id="dbDevices">[]</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">RESELLER:</div>
+                        <div class="info-value" id="dbReseller">nenhum</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">STATUS:</div>
+                        <div class="info-value" id="dbStatus">true</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">EXPIRATION:</div>
+                        <div class="info-value" id="dbExpiration">1752404879979</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">REG TIME:</div>
+                        <div class="info-value" id="dbRegTime">04:07 - 12/07/25</div>
                     </div>
                 </div>
                 
@@ -721,12 +739,13 @@
     </div>
 
     <script>
-        // Firebase configuration
+        // Updated Firebase configuration for Realtime Database
         const firebaseConfig = {
             apiKey: "AIzaSyBOg09RLtzrpwingJzcFxWxyQa-jPHUN_o",
             authDomain: "visual-cc58b.firebaseapp.com",
+            databaseURL: "https://visual-cc58b-default-rtdb.firebaseio.com", // Realtime Database URL
             projectId: "visual-cc58b",
-            storageBucket: "visual-cc58b.firebasestorage.app",
+            storageBucket: "visual-cc58b.appspot.com",
             messagingSenderId: "236633699332",
             appId: "1:236633699332:web:d71195b26b1c4ade21f151",
             measurementId: "G-RT732Q3YN8"
@@ -735,7 +754,7 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.firestore();
+        const database = firebase.database(); // Realtime Database reference
 
         // DOM Elements
         const loginForm = document.getElementById('loginForm');
@@ -754,10 +773,21 @@
         const subscriptionPlans = document.getElementById('subscriptionPlans');
         const planCards = document.querySelectorAll('.plan-card');
         
+        // Database display elements
+        const dbUsername = document.getElementById('dbUsername');
+        const dbRole = document.getElementById('dbRole');
+        const dbCoins = document.getElementById('dbCoins');
+        const dbDevices = document.getElementById('dbDevices');
+        const dbReseller = document.getElementById('dbReseller');
+        const dbStatus = document.getElementById('dbStatus');
+        const dbExpiration = document.getElementById('dbExpiration');
+        const dbRegTime = document.getElementById('dbRegTime');
+        
         // Variables
         let selectedPlan = null;
         let currentUser = null;
         let subscriptionEnd = null;
+        let userData = null;
         
         // Password toggle
         passwordToggle.addEventListener('click', () => {
@@ -793,16 +823,6 @@
             }, 3000);
         }
         
-        // Generate random OID
-        function generateOID() {
-            const chars = '0123456789abcdef';
-            let oid = '';
-            for (let i = 0; i < 32; i++) {
-                oid += chars[Math.floor(Math.random() * chars.length)];
-            }
-            oidEl.textContent = oid;
-        }
-        
         // Start countdown timer
         function startCountdown(endTime) {
             const timer = setInterval(() => {
@@ -824,6 +844,41 @@
             }, 1000);
         }
         
+        // Fetch user data from Realtime Database
+        async function fetchUserData(username) {
+            try {
+                // Reference to the 'Usuarios' node in your database
+                const ref = database.ref('Usuarios');
+                
+                // Query for the user with matching username
+                const snapshot = await ref.orderByChild('Usuário').equalTo(username).once('value');
+                
+                if (snapshot.exists()) {
+                    // Get the first matching user (should be unique)
+                    const userData = Object.values(snapshot.val())[0];
+                    
+                    // Update UI with database data
+                    dbUsername.textContent = userData['Usuário'] || 'N/A';
+                    dbRole.textContent = userData['Cargo'] || 'N/A';
+                    dbCoins.textContent = userData['Coins'] || 'N/A';
+                    dbDevices.textContent = userData['Dispositivos'] || 'N/A';
+                    dbReseller.textContent = userData['Revendedor'] || 'N/A';
+                    dbStatus.textContent = userData['Status'] || 'N/A';
+                    dbExpiration.textContent = userData['Validade'] || 'N/A';
+                    dbRegTime.textContent = userData['rgtime'] || 'N/A';
+                    
+                    return userData;
+                } else {
+                    showNotification('User data not found in database', 'error');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                showNotification('Failed to fetch user data', 'error');
+                return null;
+            }
+        }
+        
         // Login functionality
         loginBtn.addEventListener('click', async () => {
             const username = usernameInput.value;
@@ -839,54 +894,56 @@
             loginBtn.disabled = true;
             
             try {
-                // Sign in with Firebase
-                const userCredential = await auth.signInWithEmailAndPassword(username + '@astutech.com', password);
-                currentUser = userCredential.user;
+                // For demo purposes, we'll skip Firebase Authentication
+                // and directly fetch from Realtime Database
                 
-                // Get user data from Firestore
-                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                // Fetch user data from Realtime Database
+                userData = await fetchUserData(username);
                 
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    
-                    // Check if subscription is active
-                    const now = new Date();
-                    const endTime = userData.subscriptionEnd.toDate();
-                    
-                    if (endTime > now) {
-                        // Subscription is active, show dashboard
+                if (userData) {
+                    // Check if password matches
+                    if (userData.Senha === password) {
                         showNotification('Access granted! Loading dashboard...', 'success');
                         
                         // Set user details
-                        userNameEl.textContent = userData.displayName;
-                        nicknameEl.textContent = userData.displayName;
+                        userNameEl.textContent = userData['Usuário'];
+                        nicknameEl.textContent = userData['Usuário'];
                         
                         // Set OID
-                        oidEl.textContent = userData.oid || generateOID();
+                        oidEl.textContent = userData.Key || 'N/A';
                         
-                        // Transition to dashboard
-                        setTimeout(() => {
-                            loginForm.style.display = 'none';
-                            dashboard.style.display = 'block';
-                            portalContainer.style.maxWidth = '450px';
-                            
-                            // Reset login button
-                            loginBtn.innerHTML = 'Access VIP Portal';
+                        // Get expiration time
+                        const expiration = parseInt(userData.Validade);
+                        const now = Date.now();
+                        
+                        if (expiration > now) {
+                            // Transition to dashboard
+                            setTimeout(() => {
+                                loginForm.style.display = 'none';
+                                dashboard.style.display = 'block';
+                                portalContainer.style.maxWidth = '450px';
+                                
+                                // Reset login button
+                                loginBtn.innerHTML = 'Access VIP Portal';
+                                loginBtn.disabled = false;
+                                
+                                // Start countdown
+                                startCountdown(expiration);
+                            }, 1500);
+                        } else {
+                            // Subscription expired, show plans
+                            showNotification('Your subscription has expired', 'error');
+                            subscriptionPlans.style.display = 'grid';
+                            loginBtn.innerHTML = 'Renew Subscription';
                             loginBtn.disabled = false;
-                            
-                            // Start countdown
-                            startCountdown(endTime.getTime());
-                        }, 1500);
+                        }
                     } else {
-                        // Subscription expired, show plans
-                        showNotification('Your subscription has expired', 'error');
-                        subscriptionPlans.style.display = 'grid';
-                        loginBtn.innerHTML = 'Renew Subscription';
+                        showNotification('Invalid password', 'error');
+                        loginBtn.innerHTML = 'Access VIP Portal';
                         loginBtn.disabled = false;
                     }
                 } else {
-                    // User not found in Firestore
-                    showNotification('User data not found', 'error');
+                    showNotification('User not found', 'error');
                     loginBtn.innerHTML = 'Access VIP Portal';
                     loginBtn.disabled = false;
                 }
@@ -910,48 +967,9 @@
         
         // Initialize on load
         document.addEventListener('DOMContentLoaded', () => {
-            generateOID();
-            
-            // Check if user is already logged in
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    // User is signed in
-                    currentUser = user;
-                    
-                    // Get user data from Firestore
-                    db.collection('users').doc(user.uid).get().then(doc => {
-                        if (doc.exists) {
-                            const userData = doc.data();
-                            
-                            // Set user details
-                            userNameEl.textContent = userData.displayName;
-                            nicknameEl.textContent = userData.displayName;
-                            
-                            // Set OID
-                            oidEl.textContent = userData.oid || generateOID();
-                            
-                            // Check subscription
-                            const now = new Date();
-                            const endTime = userData.subscriptionEnd.toDate();
-                            
-                            if (endTime > now) {
-                                // Show dashboard
-                                loginForm.style.display = 'none';
-                                dashboard.style.display = 'block';
-                                portalContainer.style.maxWidth = '450px';
-                                
-                                // Start countdown
-                                startCountdown(endTime.getTime());
-                            } else {
-                                // Show subscription plans
-                                subscriptionPlans.style.display = 'grid';
-                                loginBtn.innerHTML = 'Renew Subscription';
-                            }
-                        }
-                    });
-                }
-            });
+            // For demo, simulate initial state
+            showNotification('Connected to Realtime Database', 'success');
         });
     </script>
 </body>
-    </html>
+                                                </html>
